@@ -195,13 +195,15 @@ spec:
           - name: CSI_LIVENESS_PROBE_MEMORY_LIMIT
             value: {{ .Values.resources.csiLivenessProbe.limits.memory | default .Values.resources.default.limits.memory | quote }}
           {{- end }}
+          {{- if .Values.enableGoCoverDir }}
+          - name: GOCOVERDIR
+            value: /go-cover-dir/
+          {{- end }}
           {{- if $driverResources }}
           resources:
 {{ $driverResources | indent 12 }}
           {{- end }}
           {{- if .Values.enableGoCoverDir }}
-          - name: GOCOVERDIR
-            value: /go-cover-dir/
           volumeMounts:
           - name: go-cover-dir
             mountPath: /go-cover-dir/
