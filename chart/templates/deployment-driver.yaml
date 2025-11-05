@@ -14,11 +14,11 @@ spec:
       labels: {{- include "longhorn.labels" . | nindent 8 }}
         app: longhorn-driver-deployer
     spec:
+      {{- $driverResources := include "longhorn.resources" (dict "component" .Values.resources.longhornDriver "default" .Values.resources.default) }}
       initContainers:
         - name: wait-longhorn-manager
           image: {{ with (coalesce .Values.global.imageRegistry (include "registry_url" .) .Values.image.longhorn.manager.registry) }}{{ . }}/{{ end }}{{ .Values.image.longhorn.manager.repository }}:{{ .Values.image.longhorn.manager.tag }}
           command: ['sh', '-c', 'while [ $(curl -m 1 -s -o /dev/null -w "%{http_code}" http://longhorn-backend:9500/v1) != "200" ]; do echo waiting; sleep 2; done']
-          {{- $driverResources := include "longhorn.resources" (dict "component" .Values.resources.longhornDriver "default" .Values.resources.default) }}
           {{- if $driverResources }}
           resources:
 {{ $driverResources | indent 12 }}
@@ -199,7 +199,6 @@ spec:
           - name: GOCOVERDIR
             value: /go-cover-dir/
           {{- end }}
-          {{- $driverResources := include "longhorn.resources" (dict "component" .Values.resources.longhornDriver "default" .Values.resources.default) }}
           {{- if $driverResources }}
           resources:
 {{ $driverResources | indent 12 }}
