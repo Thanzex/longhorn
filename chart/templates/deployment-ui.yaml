@@ -56,6 +56,7 @@ spec:
       serviceAccountName: longhorn-ui-service-account
       affinity:
       {{- toYaml .Values.longhornUI.affinity | nindent 8 }}
+      {{- $uiResources := include "longhorn.resources" (dict "component" .Values.resources.longhornUI "default" .Values.resources.default) }}
       containers:
       {{- if .Values.openshift.enabled }}
       {{- if .Values.openshift.ui.route }}
@@ -81,6 +82,10 @@ spec:
         volumeMounts:
           - mountPath: /etc/tls/private
             name: longhorn-ui-tls
+        {{- if $uiResources }}
+        resources:
+{{ $uiResources | indent 10 }}
+        {{- end }}
       {{- end }}
       {{- end }}
       - name: longhorn-ui
@@ -101,6 +106,10 @@ spec:
             value: "http://longhorn-backend:9500"
           - name: LONGHORN_UI_PORT
             value: "8000"
+        {{- if $uiResources }}
+        resources:
+{{ $uiResources | indent 10 }}
+        {{- end }}
       volumes:
       {{- if .Values.openshift.enabled }}
       {{- if .Values.openshift.ui.route }}

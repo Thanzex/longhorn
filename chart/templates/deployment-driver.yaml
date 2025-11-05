@@ -14,10 +14,15 @@ spec:
       labels: {{- include "longhorn.labels" . | nindent 8 }}
         app: longhorn-driver-deployer
     spec:
+      {{- $driverResources := include "longhorn.resources" (dict "component" .Values.resources.longhornDriver "default" .Values.resources.default) }}
       initContainers:
         - name: wait-longhorn-manager
           image: {{ with (coalesce .Values.global.imageRegistry (include "registry_url" .) .Values.image.longhorn.manager.registry) }}{{ . }}/{{ end }}{{ .Values.image.longhorn.manager.repository }}:{{ .Values.image.longhorn.manager.tag }}
           command: ['sh', '-c', 'while [ $(curl -m 1 -s -o /dev/null -w "%{http_code}" http://longhorn-backend:9500/v1) != "200" ]; do echo waiting; sleep 2; done']
+          {{- if $driverResources }}
+          resources:
+{{ $driverResources | indent 12 }}
+          {{- end }}
       containers:
         - name: longhorn-driver-deployer
           image: {{ with (coalesce .Values.global.imageRegistry (include "registry_url" .) .Values.image.longhorn.manager.registry) }}{{ . }}/{{ end }}{{ .Values.image.longhorn.manager.repository }}:{{ .Values.image.longhorn.manager.tag }}
@@ -94,9 +99,111 @@ spec:
           - name: CSI_SNAPSHOTTER_REPLICA_COUNT
             value: {{ .Values.csi.snapshotterReplicaCount | quote }}
           {{- end }}
+          {{- if or .Values.resources.csiAttacher.requests.cpu .Values.resources.default.requests.cpu }}
+          - name: CSI_ATTACHER_CPU_REQUEST
+            value: {{ .Values.resources.csiAttacher.requests.cpu | default .Values.resources.default.requests.cpu | quote }}
+          {{- end }}
+          {{- if or .Values.resources.csiAttacher.limits.cpu .Values.resources.default.limits.cpu }}
+          - name: CSI_ATTACHER_CPU_LIMIT
+            value: {{ .Values.resources.csiAttacher.limits.cpu | default .Values.resources.default.limits.cpu | quote }}
+          {{- end }}
+          {{- if or .Values.resources.csiAttacher.requests.memory .Values.resources.default.requests.memory }}
+          - name: CSI_ATTACHER_MEMORY_REQUEST
+            value: {{ .Values.resources.csiAttacher.requests.memory | default .Values.resources.default.requests.memory | quote }}
+          {{- end }}
+          {{- if or .Values.resources.csiAttacher.limits.memory .Values.resources.default.limits.memory }}
+          - name: CSI_ATTACHER_MEMORY_LIMIT
+            value: {{ .Values.resources.csiAttacher.limits.memory | default .Values.resources.default.limits.memory | quote }}
+          {{- end }}
+          {{- if or .Values.resources.csiProvisioner.requests.cpu .Values.resources.default.requests.cpu }}
+          - name: CSI_PROVISIONER_CPU_REQUEST
+            value: {{ .Values.resources.csiProvisioner.requests.cpu | default .Values.resources.default.requests.cpu | quote }}
+          {{- end }}
+          {{- if or .Values.resources.csiProvisioner.limits.cpu .Values.resources.default.limits.cpu }}
+          - name: CSI_PROVISIONER_CPU_LIMIT
+            value: {{ .Values.resources.csiProvisioner.limits.cpu | default .Values.resources.default.limits.cpu | quote }}
+          {{- end }}
+          {{- if or .Values.resources.csiProvisioner.requests.memory .Values.resources.default.requests.memory }}
+          - name: CSI_PROVISIONER_MEMORY_REQUEST
+            value: {{ .Values.resources.csiProvisioner.requests.memory | default .Values.resources.default.requests.memory | quote }}
+          {{- end }}
+          {{- if or .Values.resources.csiProvisioner.limits.memory .Values.resources.default.limits.memory }}
+          - name: CSI_PROVISIONER_MEMORY_LIMIT
+            value: {{ .Values.resources.csiProvisioner.limits.memory | default .Values.resources.default.limits.memory | quote }}
+          {{- end }}
+          {{- if or .Values.resources.csiResizer.requests.cpu .Values.resources.default.requests.cpu }}
+          - name: CSI_RESIZER_CPU_REQUEST
+            value: {{ .Values.resources.csiResizer.requests.cpu | default .Values.resources.default.requests.cpu | quote }}
+          {{- end }}
+          {{- if or .Values.resources.csiResizer.limits.cpu .Values.resources.default.limits.cpu }}
+          - name: CSI_RESIZER_CPU_LIMIT
+            value: {{ .Values.resources.csiResizer.limits.cpu | default .Values.resources.default.limits.cpu | quote }}
+          {{- end }}
+          {{- if or .Values.resources.csiResizer.requests.memory .Values.resources.default.requests.memory }}
+          - name: CSI_RESIZER_MEMORY_REQUEST
+            value: {{ .Values.resources.csiResizer.requests.memory | default .Values.resources.default.requests.memory | quote }}
+          {{- end }}
+          {{- if or .Values.resources.csiResizer.limits.memory .Values.resources.default.limits.memory }}
+          - name: CSI_RESIZER_MEMORY_LIMIT
+            value: {{ .Values.resources.csiResizer.limits.memory | default .Values.resources.default.limits.memory | quote }}
+          {{- end }}
+          {{- if or .Values.resources.csiSnapshotter.requests.cpu .Values.resources.default.requests.cpu }}
+          - name: CSI_SNAPSHOTTER_CPU_REQUEST
+            value: {{ .Values.resources.csiSnapshotter.requests.cpu | default .Values.resources.default.requests.cpu | quote }}
+          {{- end }}
+          {{- if or .Values.resources.csiSnapshotter.limits.cpu .Values.resources.default.limits.cpu }}
+          - name: CSI_SNAPSHOTTER_CPU_LIMIT
+            value: {{ .Values.resources.csiSnapshotter.limits.cpu | default .Values.resources.default.limits.cpu | quote }}
+          {{- end }}
+          {{- if or .Values.resources.csiSnapshotter.requests.memory .Values.resources.default.requests.memory }}
+          - name: CSI_SNAPSHOTTER_MEMORY_REQUEST
+            value: {{ .Values.resources.csiSnapshotter.requests.memory | default .Values.resources.default.requests.memory | quote }}
+          {{- end }}
+          {{- if or .Values.resources.csiSnapshotter.limits.memory .Values.resources.default.limits.memory }}
+          - name: CSI_SNAPSHOTTER_MEMORY_LIMIT
+            value: {{ .Values.resources.csiSnapshotter.limits.memory | default .Values.resources.default.limits.memory | quote }}
+          {{- end }}
+          {{- if or .Values.resources.csiNodeDriverRegistrar.requests.cpu .Values.resources.default.requests.cpu }}
+          - name: CSI_NODE_DRIVER_REGISTRAR_CPU_REQUEST
+            value: {{ .Values.resources.csiNodeDriverRegistrar.requests.cpu | default .Values.resources.default.requests.cpu | quote }}
+          {{- end }}
+          {{- if or .Values.resources.csiNodeDriverRegistrar.limits.cpu .Values.resources.default.limits.cpu }}
+          - name: CSI_NODE_DRIVER_REGISTRAR_CPU_LIMIT
+            value: {{ .Values.resources.csiNodeDriverRegistrar.limits.cpu | default .Values.resources.default.limits.cpu | quote }}
+          {{- end }}
+          {{- if or .Values.resources.csiNodeDriverRegistrar.requests.memory .Values.resources.default.requests.memory }}
+          - name: CSI_NODE_DRIVER_REGISTRAR_MEMORY_REQUEST
+            value: {{ .Values.resources.csiNodeDriverRegistrar.requests.memory | default .Values.resources.default.requests.memory | quote }}
+          {{- end }}
+          {{- if or .Values.resources.csiNodeDriverRegistrar.limits.memory .Values.resources.default.limits.memory }}
+          - name: CSI_NODE_DRIVER_REGISTRAR_MEMORY_LIMIT
+            value: {{ .Values.resources.csiNodeDriverRegistrar.limits.memory | default .Values.resources.default.limits.memory | quote }}
+          {{- end }}
+          {{- if or .Values.resources.csiLivenessProbe.requests.cpu .Values.resources.default.requests.cpu }}
+          - name: CSI_LIVENESS_PROBE_CPU_REQUEST
+            value: {{ .Values.resources.csiLivenessProbe.requests.cpu | default .Values.resources.default.requests.cpu | quote }}
+          {{- end }}
+          {{- if or .Values.resources.csiLivenessProbe.limits.cpu .Values.resources.default.limits.cpu }}
+          - name: CSI_LIVENESS_PROBE_CPU_LIMIT
+            value: {{ .Values.resources.csiLivenessProbe.limits.cpu | default .Values.resources.default.limits.cpu | quote }}
+          {{- end }}
+          {{- if or .Values.resources.csiLivenessProbe.requests.memory .Values.resources.default.requests.memory }}
+          - name: CSI_LIVENESS_PROBE_MEMORY_REQUEST
+            value: {{ .Values.resources.csiLivenessProbe.requests.memory | default .Values.resources.default.requests.memory | quote }}
+          {{- end }}
+          {{- if or .Values.resources.csiLivenessProbe.limits.memory .Values.resources.default.limits.memory }}
+          - name: CSI_LIVENESS_PROBE_MEMORY_LIMIT
+            value: {{ .Values.resources.csiLivenessProbe.limits.memory | default .Values.resources.default.limits.memory | quote }}
+          {{- end }}
           {{- if .Values.enableGoCoverDir }}
           - name: GOCOVERDIR
             value: /go-cover-dir/
+          {{- end }}
+          {{- if $driverResources }}
+          resources:
+{{ $driverResources | indent 12 }}
+          {{- end }}
+          {{- if .Values.enableGoCoverDir }}
           volumeMounts:
           - name: go-cover-dir
             mountPath: /go-cover-dir/

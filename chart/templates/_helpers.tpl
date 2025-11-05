@@ -78,3 +78,20 @@ Output: properly quoted YAML string
     {{- $v | quote -}}
   {{- end -}}
 {{- end -}}
+
+{{- /*
+longhorn.resources helper
+Merges component-specific resources with default resources.
+If component resources are provided, they are used; otherwise defaults to the default resources.
+Input: dict with "component" and "default" keys
+Output: merged resources object
+*/ -}}
+{{- define "longhorn.resources" -}}
+  {{- $component := .component -}}
+  {{- $default := .default -}}
+  {{- if or $component.limits $component.requests -}}
+    {{- $component | toYaml -}}
+  {{- else if or $default.limits $default.requests -}}
+    {{- $default | toYaml -}}
+  {{- end -}}
+{{- end -}}

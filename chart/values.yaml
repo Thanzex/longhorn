@@ -35,6 +35,47 @@ networkPolicies:
   enabled: false
   # -- Distribution that determines the policy for allowing access for an ingress. (Options: "k3s", "rke2", "rke1")
   type: "k3s"
+resources:
+  # -- Default resource limits and requests for Longhorn components. By default, no resource limits or requests are set.
+  default:
+    limits: {}
+    requests: {}
+  # -- Resource limits and requests for Longhorn Manager DaemonSet. When unspecified, the default resources are used.
+  longhornManager:
+    limits: {}
+    requests: {}
+  # -- Resource limits and requests for Longhorn Driver Deployer. When unspecified, the default resources are used.
+  longhornDriver:
+    limits: {}
+    requests: {}
+  # -- Resource limits and requests for Longhorn UI. When unspecified, the default resources are used.
+  longhornUI:
+    limits: {}
+    requests: {}
+  # -- Resource limits and requests for CSI Attacher. When unspecified, the default resources are used.
+  csiAttacher:
+    limits: {}
+    requests: {}
+  # -- Resource limits and requests for CSI Provisioner. When unspecified, the default resources are used.
+  csiProvisioner:
+    limits: {}
+    requests: {}
+  # -- Resource limits and requests for CSI Resizer. When unspecified, the default resources are used.
+  csiResizer:
+    limits: {}
+    requests: {}
+  # -- Resource limits and requests for CSI Snapshotter. When unspecified, the default resources are used.
+  csiSnapshotter:
+    limits: {}
+    requests: {}
+  # -- Resource limits and requests for CSI Node Driver Registrar. When unspecified, the default resources are used.
+  csiNodeDriverRegistrar:
+    limits: {}
+    requests: {}
+  # -- Resource limits and requests for CSI Liveness Probe. When unspecified, the default resources are used.
+  csiLivenessProbe:
+    limits: {}
+    requests: {}
 image:
   longhorn:
     engine:
