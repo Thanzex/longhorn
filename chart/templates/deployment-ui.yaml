@@ -81,6 +81,11 @@ spec:
         volumeMounts:
           - mountPath: /etc/tls/private
             name: longhorn-ui-tls
+        {{- $uiResources := include "longhorn.resources" (dict "component" .Values.resources.longhornUI "default" .Values.resources.default) }}
+        {{- if $uiResources }}
+        resources:
+{{ $uiResources | indent 10 }}
+        {{- end }}
       {{- end }}
       {{- end }}
       - name: longhorn-ui
@@ -101,6 +106,11 @@ spec:
             value: "http://longhorn-backend:9500"
           - name: LONGHORN_UI_PORT
             value: "8000"
+        {{- $uiResources := include "longhorn.resources" (dict "component" .Values.resources.longhornUI "default" .Values.resources.default) }}
+        {{- if $uiResources }}
+        resources:
+{{ $uiResources | indent 10 }}
+        {{- end }}
       volumes:
       {{- if .Values.openshift.enabled }}
       {{- if .Values.openshift.ui.route }}
